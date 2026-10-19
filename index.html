@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101316" />
+    <meta name="description" content="RaceTech Robotics is a small team building, tuning, and racing RC cars." />
+    <title>RaceTech Robotics | Built to run</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body data-page="home">
+    <div class="site-shell">
+      <div class="rec-banner" id="rec-banner">
+        <span>Independent RC car builders. Always testing, always improving.</span>
+        <button class="text-button" type="button" onclick="openModal('auth-modal')">Team access <span aria-hidden="true">↗</span></button>
+      </div>
+
+      <div class="cms-toolbar" id="cms-toolbar" hidden>
+        <span class="eyebrow">TEAM TOOLS</span>
+        <span id="edit-state">Edit mode is off</span>
+        <button class="tech-btn small-btn" type="button" onclick="toggleEditMode()">Toggle edit</button>
+        <label class="upload-control">Update feature photo<input type="file" accept="image/*" onchange="uploadHomeImage(event)" /></label>
+      </div>
+
+      <header class="navbar">
+        <a class="logo" href="index.html" aria-label="RaceTech Robotics home">
+          <span class="logo-mark" aria-hidden="true">R</span>
+          <span>RaceTech <span class="logo-light">Robotics</span></span>
+        </a>
+        <nav class="nav-controls" aria-label="Main navigation">
+          <div class="pages-dropdown">
+            <button class="tech-btn nav-trigger" id="pages-toggle" type="button" aria-expanded="false" aria-controls="pages-menu">
+              Pages <span class="chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="dropdown-content" id="pages-menu" hidden>
+              <a href="index.html" aria-current="page"><span>01</span> Home</a>
+              <a href="gallery.html"><span>02</span> Garage</a>
+              <a href="team.html"><span>03</span> The team</a>
+              <a href="admin.html" id="nav-admin-link" hidden><span>04</span> Admin</a>
+            </div>
+          </div>
+          <button class="tech-btn" type="button" onclick="openModal('settings-modal')">Settings</button>
+          <button class="tech-btn login-btn" id="user-display" type="button" onclick="openModal('auth-modal')">Team login</button>
+          <div id="role-badge-container"></div>
+        </nav>
+      </header>
+
+      <main class="container">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="live-dot"></span> SMALL TEAM. REAL MACHINES.</p>
+            <h1>Built to run.<br /><span>Made to race.</span></h1>
+            <p class="hero-desc editable" data-key="home-hero-desc">We’re RaceTech Robotics — an independent crew building, tuning, and racing RC cars. From the first sketch to the last lap, we make every detail count.</p>
+            <div class="hero-actions">
+              <a class="tech-btn primary-btn" href="gallery.html">Explore the garage <span aria-hidden="true">↗</span></a>
+              <a class="text-button" href="team.html">Meet the crew <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="hero-stats" aria-label="What we do">
+              <div><strong>01</strong><span>Design</span></div>
+              <div><strong>02</strong><span>Build</span></div>
+              <div><strong>03</strong><span>Race</span></div>
+            </div>
+          </div>
+          <figure class="hero-visual">
+            <img id="home-featured-img" src="https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1600&q=85" alt="Radio-controlled car ready for a race" />
+            <figcaption><span>RACETECH / FIELD NOTES</span><span>DESIGNED TO MOVE</span></figcaption>
+            <span class="visual-index" aria-hidden="true">RT—01</span>
+          </figure>
+        </section>
+
+        <section class="intro-section">
+          <div class="section-kicker">01 / OUR THING</div>
+          <div>
+            <h2>Small-scale cars.<br /><span>Full-scale obsession.</span></h2>
+            <p class="editable" data-key="home-about-copy">We’re a hands-on RC car making team. We bring together practical engineering, creative design, and a healthy appetite for one more test run. Every build is made to be driven, not just admired.</p>
+            <a class="text-button" href="team.html">A little more about us <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+
+        <section class="home-feature-grid">
+          <a class="feature-card" href="gallery.html">
+            <span class="feature-number">01</span>
+            <div><p class="eyebrow">THE GARAGE</p><h3>Builds, parts<br />and test runs.</h3></div>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="feature-card feature-card-accent" href="team.html">
+            <span class="feature-number">02</span>
+            <div><p class="eyebrow">THE PEOPLE</p><h3>Meet the crew<br />behind the cars.</h3></div>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </a>
+        </section>
+      </main>
+
+      <footer class="site-footer"><a class="footer-brand" href="index.html">RaceTech Robotics</a><span>Built with curiosity. Tuned for fun.</span><a href="gallery.html">Back to the garage ↗</a></footer>
+    </div>
+
+    <div id="auth-modal" class="modal-overlay" style="display:none;">
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <div class="modal-header"><div><p class="eyebrow">CREW ACCESS</p><h2 id="auth-title">Welcome back.</h2></div><button class="icon-button" type="button" aria-label="Close" onclick="closeModal('auth-modal')">×</button></div>
+        <div class="tab-row"><button id="tab-login" class="tab-btn active" type="button" onclick="switchAuthTab('login')">Log in</button><button id="tab-register" class="tab-btn" type="button" onclick="switchAuthTab('register')">Create account</button></div>
+        <form id="auth-form" onsubmit="handleAuth(event)">
+          <label class="field-label" for="username">Call sign</label><input id="username" type="text" autocomplete="username" placeholder="Your name" required />
+          <label class="field-label" for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required />
+          <button class="tech-btn primary-btn form-submit" id="auth-submit-text" type="submit">Log in</button>
+          <p id="auth-status-text" class="form-status" role="status">Sign in to continue.</p>
+        </form>
+      </section>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay" style="display:none;">
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="modal-header"><div><p class="eyebrow">PREFERENCES</p><h2 id="settings-title">Settings</h2></div><button class="icon-button" type="button" aria-label="Close" onclick="closeModal('settings-modal')">×</button></div>
+        <label class="toggle-row"><span><strong>Background grid</strong><small>A little workshop texture</small></span><input id="toggle-grid" type="checkbox" checked onchange="toggleSetting('grid')" /></label>
+        <label class="toggle-row"><span><strong>Pointer glow</strong><small>Soft light that follows your cursor</small></span><input id="toggle-glow" type="checkbox" checked onchange="toggleSetting('glow')" /></label>
+        <button class="text-button settings-login" type="button" onclick="logoutUser()" id="logout-button" hidden>Log out <span aria-hidden="true">→</span></button>
+      </section>
+    </div>
+  </body>
+</html>

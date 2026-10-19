@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101316" />
+    <meta name="description" content="RaceTech Robotics crew administration." />
+    <title>Admin | RaceTech Robotics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body data-page="admin">
+    <div class="site-shell">
+      <header class="navbar">
+        <a class="logo" href="index.html" aria-label="RaceTech Robotics home"><span class="logo-mark" aria-hidden="true">R</span><span>RaceTech <span class="logo-light">Robotics</span></span></a>
+        <nav class="nav-controls" aria-label="Main navigation">
+          <div class="pages-dropdown"><button class="tech-btn nav-trigger" id="pages-toggle" type="button" aria-expanded="false" aria-controls="pages-menu">Pages <span class="chevron" aria-hidden="true">⌄</span></button><div class="dropdown-content" id="pages-menu" hidden><a href="index.html"><span>01</span> Home</a><a href="gallery.html"><span>02</span> Garage</a><a href="team.html"><span>03</span> The team</a><a href="admin.html" id="nav-admin-link" hidden aria-current="page"><span>04</span> Admin</a></div></div>
+          <button class="tech-btn" type="button" onclick="openModal('settings-modal')">Settings</button><button class="tech-btn login-btn" id="user-display" type="button" onclick="openModal('auth-modal')">Team login</button><div id="role-badge-container"></div>
+        </nav>
+      </header>
+      <main class="container subpage">
+        <header class="page-heading"><p class="eyebrow">04 / TEAM TOOLS</p><h1>Control <span>room.</span></h1><p>Manage crew access and keep the team directory up to date.</p></header>
+        <div class="admin-notice" id="admin-mode-notice"></div>
+        <div class="table-wrap"><table class="admin-table"><thead><tr><th>Call sign</th><th>Role</th><th>Access</th><th>Update role</th></tr></thead><tbody id="admin-user-table"></tbody></table></div>
+      </main>
+      <footer class="site-footer"><a class="footer-brand" href="index.html">RaceTech Robotics</a><span>Built with curiosity. Tuned for fun.</span><a href="team.html">Back to the crew ↗</a></footer>
+    </div>
+    <div id="auth-modal" class="modal-overlay" style="display:none;"><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-title"><div class="modal-header"><div><p class="eyebrow">CREW ACCESS</p><h2 id="auth-title">Welcome back.</h2></div><button class="icon-button" type="button" aria-label="Close" onclick="closeModal('auth-modal')">×</button></div><div class="tab-row"><button id="tab-login" class="tab-btn active" type="button" onclick="switchAuthTab('login')">Log in</button><button id="tab-register" class="tab-btn" type="button" onclick="switchAuthTab('register')">Create account</button></div><form id="auth-form" onsubmit="handleAuth(event)"><label class="field-label" for="username">Call sign</label><input id="username" type="text" autocomplete="username" placeholder="Your name" required /><label class="field-label" for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required /><button class="tech-btn primary-btn form-submit" id="auth-submit-text" type="submit">Log in</button><p id="auth-status-text" class="form-status" role="status">Sign in to continue.</p></form></section></div>
+    <div id="settings-modal" class="modal-overlay" style="display:none;"><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title"><div class="modal-header"><div><p class="eyebrow">PREFERENCES</p><h2 id="settings-title">Settings</h2></div><button class="icon-button" type="button" aria-label="Close" onclick="closeModal('settings-modal')">×</button></div><label class="toggle-row"><span><strong>Background grid</strong><small>A little workshop texture</small></span><input id="toggle-grid" type="checkbox" checked onchange="toggleSetting('grid')" /></label><label class="toggle-row"><span><strong>Pointer glow</strong><small>Soft light that follows your cursor</small></span><input id="toggle-glow" type="checkbox" checked onchange="toggleSetting('glow')" /></label><button class="text-button settings-login" type="button" onclick="logoutUser()" id="logout-button" hidden>Log out <span aria-hidden="true">→</span></button></section></div>
+  </body>
+</html>
