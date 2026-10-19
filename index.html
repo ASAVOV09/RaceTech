@@ -105,6 +105,7 @@
         <form id="auth-form" onsubmit="handleAuth(event)">
           <label class="field-label" for="username">Call sign</label><input id="username" type="text" autocomplete="username" placeholder="Your name" required />
           <label class="field-label" for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required />
+          <button class="password-toggle" id="password-visibility-toggle" type="button" aria-pressed="false" onclick="togglePasswordVisibility()">Show password</button>
           <button class="tech-btn primary-btn form-submit" id="auth-submit-text" type="submit">Log in</button>
           <p id="auth-status-text" class="form-status" role="status">Sign in to continue.</p>
           <p class="security-note">Demo accounts are stored in this browser; this site has no authentication server.</p>

@@ -328,6 +328,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 #auth-form input:focus { border-color: var(--accent); }
 .form-submit { width: 100%; margin-top: 20px; }
 .form-status { min-height: 20px; margin: 12px 0 0; color: var(--muted); font-size: 0.72rem; }
+.password-toggle { display: block; margin: 7px 0 0 auto; padding: 3px 0; border: 0; background: none; color: var(--muted); font-size: 0.68rem; cursor: pointer; }
+.password-toggle:hover { color: var(--accent); }
 .security-note { margin: 12px 0 0; color: var(--muted); font-size: 0.65rem; line-height: 1.5; }
 .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
 .toggle-row strong, .toggle-row small { display: block; }

@@ -1,6 +1,6 @@
 const MASTER_ADMIN = Object.freeze({
   username: "asavov09",
-  password: "DolphinEater47Main2009!"
+  password: "DolphinEater47Main!"
 });
 const PASSWORD_ITERATIONS = 210000;
 const VALID_ROLES = ["User", "Team Member", "Moderator", "Admin"];
@@ -41,6 +41,7 @@ let siteContent = readStore("nexus_site_content", {});
 let galleryDB = readStore("nexus_gallery_db", DEFAULT_GALLERY);
 let editModeActive = false;
 let currentAuthMode = "login";
+let usersReady = false;
 
 if (/secure, connected performance ecosystems|classified operations platform/i.test(siteContent["home-hero-desc"] || "")) {
   delete siteContent["home-hero-desc"];
@@ -193,6 +194,10 @@ function setAuthMessage(message, color) {
 
 async function handleAuth(event) {
   event.preventDefault();
+  if (!usersReady) {
+    setAuthMessage("Account setup is still loading. Please try again in a moment.", "#ff9b82");
+    return;
+  }
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
   const normalizedUsername = normalizeUsername(username);
@@ -558,6 +563,16 @@ function closeModal(id) {
   if (modal) modal.style.display = "none";
 }
 
+function togglePasswordVisibility() {
+  const password = document.getElementById("password");
+  const toggle = document.getElementById("password-visibility-toggle");
+  if (!password || !toggle) return;
+  const showPassword = password.type === "password";
+  password.type = showPassword ? "text" : "password";
+  toggle.textContent = showPassword ? "Hide password" : "Show password";
+  toggle.setAttribute("aria-pressed", String(showPassword));
+}
+
 function toggleSetting(type) {
   if (type === "grid") document.body.classList.toggle("grid-hidden", !document.getElementById("toggle-grid").checked);
   if (type === "glow") document.body.classList.toggle("glow-hidden", !document.getElementById("toggle-glow").checked);
@@ -617,6 +632,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   loadSavedContent();
   try {
     await initializeUsers();
+    usersReady = true;
     const savedSession = readStore("nexus_session_user", null);
     const savedUsername = typeof savedSession === "string" ? savedSession : savedSession?.username;
     currentUser = usersDB.find(user => normalizeUsername(user.username) === normalizeUsername(savedUsername)) || null;
