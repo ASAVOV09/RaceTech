@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101316" />
+    <meta name="description" content="Completed RaceTech Robotics RC car projects and their final results." />
+    <title>Final Projects | RaceTech Robotics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body data-page="final-projects">
+    <div class="site-shell">
+      <header class="navbar">
+        <a class="logo" href="index.html" aria-label="RaceTech Robotics home"><span class="logo-mark" aria-hidden="true">R</span><span>RaceTech <span class="logo-light">Robotics</span></span></a>
+        <nav class="nav-controls" aria-label="Main navigation">
+          <div class="pages-dropdown"><button class="tech-btn nav-trigger" id="pages-toggle" type="button" aria-expanded="false" aria-controls="pages-menu">Pages <span class="chevron" aria-hidden="true">⌄</span></button><div class="dropdown-content" id="pages-menu" hidden><a href="index.html"><span>01</span> Home</a><a href="garage.html"><span>02</span> Garage</a><a href="gallery.html"><span>03</span> Gallery</a><a href="projects.html"><span>04</span> Projects</a><a href="final-projects.html" aria-current="page"><span>05</span> Final Projects</a><a href="team.html"><span>06</span> The team</a></div></div>
+          <button class="tech-btn" type="button" onclick="openModal('settings-modal')">Settings</button>
+        </nav>
+      </header>
+      <main class="container subpage">
+        <header class="page-heading"><p class="eyebrow">05 / FINISHED BUILDS</p><h1>From sketch<br /><span>to finish line.</span></h1><p>Completed builds, the choices behind them, and how they turned out. These sample projects and images are placeholders for your real finished work.</p></header>
+        <section class="final-project-grid" aria-label="Completed projects">
+          <article class="final-project-card">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Placeholder final image of the Switchback project" loading="lazy" />
+            <div class="final-project-copy"><p class="eyebrow">COMPLETED BUILD / 01</p><h2>Switchback</h2><p>A versatile all-terrain setup tuned for predictable steering and a comfortable ride over uneven ground.</p><dl class="project-specs"><div><dt>Build focus</dt><dd>Suspension &amp; control</dd></div><div><dt>Result</dt><dd>Stable on mixed surfaces</dd></div></dl></div>
+          </article>
+          <article class="final-project-card">
+            <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Placeholder final image of the Nightline project" loading="lazy" />
+            <div class="final-project-copy"><p class="eyebrow">COMPLETED BUILD / 02</p><h2>Nightline</h2><p>A clean street-inspired finish paired with balanced weight and smooth response for paved runs.</p><dl class="project-specs"><div><dt>Build focus</dt><dd>Bodywork &amp; balance</dd></div><div><dt>Result</dt><dd>Composed road handling</dd></div></dl></div>
+          </article>
+          <article class="final-project-card">
+            <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Placeholder final image of the Apex project" loading="lazy" />
+            <div class="final-project-copy"><p class="eyebrow">COMPLETED BUILD / 03</p><h2>Apex</h2><p>A compact track build refined through repeatable test laps and practical, easy-to-service components.</p><dl class="project-specs"><div><dt>Build focus</dt><dd>Drivetrain &amp; tuning</dd></div><div><dt>Result</dt><dd>Consistent lap behavior</dd></div></dl></div>
+          </article>
+        </section>
+        <section class="gallery-note"><p class="eyebrow">THE FINISH LINE IS A START</p><p>Swap in your completed build photos, real project names, and measured results in <code>final-projects.html</code>. Add works-in-progress on the <a href="projects.html">Projects page</a>.</p></section>
+      </main>
+      <footer class="site-footer"><a class="footer-brand" href="index.html">RaceTech Robotics</a><span>Built with curiosity. Tuned for fun.</span><a href="gallery.html">Back to the gallery ↗</a></footer>
+    </div>
+    <div id="settings-modal" class="modal-overlay" style="display:none;"><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title"><div class="modal-header"><div><p class="eyebrow">PREFERENCES</p><h2 id="settings-title">Settings</h2></div><button class="icon-button" type="button" aria-label="Close" onclick="closeModal('settings-modal')">×</button></div><label class="toggle-row"><span><strong>Background grid</strong><small>A little workshop texture</small></span><input id="toggle-grid" type="checkbox" checked onchange="toggleSetting('grid')" /></label><label class="toggle-row"><span><strong>Pointer glow</strong><small>Soft light that follows your cursor</small></span><input id="toggle-glow" type="checkbox" checked onchange="toggleSetting('glow')" /></label></section></div>
+  </body>
+</html>
