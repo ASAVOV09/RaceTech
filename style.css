@@ -198,6 +198,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .role-pill { display: inline-flex; align-items: center; padding: 6px 9px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--muted); font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; }
 .badge-admin, .badge-mod { border-color: rgba(197, 243, 106, 0.45); color: var(--accent); }
 .badge-team { color: var(--text); }
+.badge-user { color: var(--muted); }
+.team-profile-badge { margin-left: 6px; vertical-align: middle; }
 
 .container { padding: 50px 0 110px; }
 .hero {
@@ -326,6 +328,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 #auth-form input:focus { border-color: var(--accent); }
 .form-submit { width: 100%; margin-top: 20px; }
 .form-status { min-height: 20px; margin: 12px 0 0; color: var(--muted); font-size: 0.72rem; }
+.security-note { margin: 12px 0 0; color: var(--muted); font-size: 0.65rem; line-height: 1.5; }
 .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
 .toggle-row strong, .toggle-row small { display: block; }
 .toggle-row strong { font-size: 0.82rem; }

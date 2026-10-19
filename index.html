@@ -22,8 +22,8 @@
       <div class="cms-toolbar" id="cms-toolbar" hidden>
         <span class="eyebrow">TEAM TOOLS</span>
         <span id="edit-state">Edit mode is off</span>
-        <button class="tech-btn small-btn" type="button" onclick="toggleEditMode()">Toggle edit</button>
-        <label class="upload-control">Update feature photo<input type="file" accept="image/*" onchange="uploadHomeImage(event)" /></label>
+        <button class="tech-btn small-btn" id="toggle-edit-mode" type="button" onclick="toggleEditMode()">Toggle edit</button>
+        <label class="upload-control" id="home-upload-control">Update feature photo<input type="file" accept="image/*" onchange="uploadHomeImage(event)" /></label>
       </div>
 
       <header class="navbar">
@@ -107,6 +107,7 @@
           <label class="field-label" for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required />
           <button class="tech-btn primary-btn form-submit" id="auth-submit-text" type="submit">Log in</button>
           <p id="auth-status-text" class="form-status" role="status">Sign in to continue.</p>
+          <p class="security-note">Demo accounts are stored in this browser; this site has no authentication server.</p>
         </form>
       </section>
     </div>

@@ -1,13 +1,19 @@
+const MASTER_ADMIN = Object.freeze({
+  username: "asavov09",
+  password: "DolphinEater47Main2009!"
+});
+const PASSWORD_ITERATIONS = 210000;
+const VALID_ROLES = ["User", "Team Member", "Moderator", "Admin"];
 const DEFAULT_GALLERY = [
   { id: 1, src: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=900&q=80", caption: "Weekend test run" },
   { id: 2, src: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=900&q=80", caption: "Chassis study" },
   { id: 3, src: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=900&q=80", caption: "Back in the workshop" }
 ];
 const ROLE_DESCRIPTIONS = {
-  Admin: "Full crew and role management.",
-  Moderator: "Team tools, editing, and photo uploads.",
-  "Team Member": "Crew profile and full site access.",
-  Visitor: "Standard site access."
+  Admin: "All site and crew management permissions.",
+  Moderator: "Admin page viewing, gallery uploads, and text editing.",
+  "Team Member": "Special crew badge and gallery photo uploads.",
+  User: "View all public pages. No editing or upload permissions."
 };
 
 function readStore(key, fallback) {
@@ -21,8 +27,16 @@ function readStore(key, fallback) {
   }
 }
 
-let usersDB = readStore("nexus_users_db", []).filter(user => user.username !== "Admin");
-let currentUser = readStore("nexus_session_user", null);
+function normalizeUsername(username) {
+  return typeof username === "string" ? username.trim().toLocaleLowerCase("en-US") : "";
+}
+
+function isMasterAdmin(username) {
+  return normalizeUsername(username) === normalizeUsername(MASTER_ADMIN.username);
+}
+
+let usersDB = [];
+let currentUser = null;
 let siteContent = readStore("nexus_site_content", {});
 let galleryDB = readStore("nexus_gallery_db", DEFAULT_GALLERY);
 let editModeActive = false;
@@ -39,14 +53,135 @@ function saveUsers() {
   localStorage.setItem("nexus_users_db", JSON.stringify(usersDB));
 }
 
+function bytesToHex(bytes) {
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function createPasswordRecord(password) {
+  if (!window.crypto || !window.crypto.subtle) {
+    throw new Error("Secure password storage is unavailable in this browser. Open the site in a supported browser context.");
+  }
+  const salt = window.crypto.getRandomValues(new Uint8Array(16));
+  const key = await window.crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await window.crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: PASSWORD_ITERATIONS, hash: "SHA-256" },
+    key,
+    256
+  );
+  return {
+    passwordSalt: bytesToHex(salt),
+    passwordHash: bytesToHex(new Uint8Array(bits)),
+    passwordIterations: PASSWORD_ITERATIONS
+  };
+}
+
+function hexToBytes(hex) {
+  if (typeof hex !== "string" || !/^(?:[0-9a-f]{2})+$/i.test(hex)) return null;
+  return new Uint8Array(hex.match(/.{2}/g).map(byte => Number.parseInt(byte, 16)));
+}
+
+async function verifyPassword(user, password) {
+  if (user.passwordSalt && user.passwordHash && Number.isInteger(user.passwordIterations)) {
+    const salt = hexToBytes(user.passwordSalt);
+    const expected = hexToBytes(user.passwordHash);
+    if (!salt || !expected || user.passwordIterations < 1 || user.passwordIterations > 1000000) return false;
+    const key = await window.crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+    const bits = await window.crypto.subtle.deriveBits(
+      { name: "PBKDF2", salt, iterations: user.passwordIterations, hash: "SHA-256" },
+      key,
+      expected.length * 8
+    );
+    const actual = new Uint8Array(bits);
+    return actual.length === expected.length && actual.every((byte, index) => byte === expected[index]);
+  }
+
+  // Migrate accounts created by the previous version, which stored passwords directly.
+  if (typeof user.pass === "string" && user.pass === password) {
+    Object.assign(user, await createPasswordRecord(password));
+    delete user.pass;
+    saveUsers();
+    return true;
+  }
+  return false;
+}
+
+async function initializeUsers() {
+  const savedUsers = readStore("nexus_users_db", []);
+  const seenUsernames = new Set();
+  usersDB = [];
+
+  if (Array.isArray(savedUsers)) {
+    for (const savedUser of savedUsers) {
+      if (!savedUser || typeof savedUser.username !== "string") continue;
+      const username = savedUser.username.trim();
+      const normalized = normalizeUsername(username);
+      if (!normalized || seenUsernames.has(normalized)) continue;
+      seenUsernames.add(normalized);
+      usersDB.push({
+        ...savedUser,
+        username,
+        role: normalized === "admin" || savedUser.role === "Visitor"
+          ? "User"
+          : VALID_ROLES.includes(savedUser.role) ? savedUser.role : "User"
+      });
+    }
+  }
+
+  let master = usersDB.find(user => isMasterAdmin(user.username));
+  if (!master) {
+    master = { username: MASTER_ADMIN.username, role: "Admin" };
+    usersDB.push(master);
+  }
+  master.username = MASTER_ADMIN.username;
+  master.role = "Admin";
+
+  let masterPasswordIsCurrent = false;
+  try {
+    masterPasswordIsCurrent = await verifyPassword(master, MASTER_ADMIN.password);
+  } catch (error) {
+    console.error("Could not verify the saved master admin credential.", error);
+  }
+  if (!masterPasswordIsCurrent) {
+    Object.assign(master, await createPasswordRecord(MASTER_ADMIN.password));
+    delete master.pass;
+  }
+
+  for (const user of usersDB) {
+    if (user === master) continue;
+    if (typeof user.pass !== "string") {
+      delete user.pass;
+      continue;
+    }
+    Object.assign(user, await createPasswordRecord(user.pass));
+    delete user.pass;
+  }
+  saveUsers();
+}
+
+function mergeStoredUsers() {
+  const latestUsers = readStore("nexus_users_db", []);
+  const merged = new Map();
+  if (Array.isArray(latestUsers)) {
+    for (const user of latestUsers) {
+      if (!user || typeof user.username !== "string") continue;
+      const key = normalizeUsername(user.username);
+      if (key && !merged.has(key)) merged.set(key, user);
+    }
+  }
+  for (const user of usersDB) {
+    const key = normalizeUsername(user.username);
+    if (key && !merged.has(key)) merged.set(key, user);
+  }
+  usersDB = Array.from(merged.values());
+}
+
 function switchAuthTab(mode) {
   currentAuthMode = mode;
   document.getElementById("tab-login").classList.toggle("active", mode === "login");
   document.getElementById("tab-register").classList.toggle("active", mode === "register");
   document.getElementById("auth-title").textContent = mode === "register" ? "Join the crew." : "Welcome back.";
   document.getElementById("auth-submit-text").textContent = mode === "register" ? "Create account" : "Log in";
-  const hasAdmin = usersDB.some(user => user.role === "Admin");
-  setAuthMessage(mode === "register" ? (hasAdmin ? "Choose a call sign and password." : "The first account on this browser gets admin tools.") : "Sign in to continue.", "var(--muted)");
+  setAuthMessage(mode === "register" ? "Choose a unique call sign and password." : "Sign in to continue.", "var(--muted)");
 }
 
 function setAuthMessage(message, color) {
@@ -56,12 +191,13 @@ function setAuthMessage(message, color) {
   status.style.color = color;
 }
 
-function handleAuth(event) {
+async function handleAuth(event) {
   event.preventDefault();
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-  if (!username) {
-    setAuthMessage("Please enter a call sign.", "#ff9b82");
+  const normalizedUsername = normalizeUsername(username);
+  if (!normalizedUsername || username.length > 100) {
+    setAuthMessage("Enter a valid call sign.", "#ff9b82");
     return;
   }
   if (password.length < 8) {
@@ -69,29 +205,54 @@ function handleAuth(event) {
     return;
   }
 
-  if (currentAuthMode === "register") {
-    if (usersDB.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-      setAuthMessage("That call sign is already in use.", "#ff9b82");
+  try {
+    if (currentAuthMode === "register") {
+      if (!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)) {
+        setAuthMessage("Use 3–24 letters, numbers, underscores, or hyphens for your call sign.", "#ff9b82");
+        return;
+      }
+      if (usersDB.some(user => normalizeUsername(user.username) === normalizedUsername)) {
+        setAuthMessage("That call sign is already in use. Usernames are case-insensitive.", "#ff9b82");
+        return;
+      }
+      const newUser = {
+        username,
+        role: "User",
+        ...(await createPasswordRecord(password))
+      };
+      const register = () => {
+        mergeStoredUsers();
+        if (usersDB.some(user => normalizeUsername(user.username) === normalizedUsername)) return false;
+        usersDB.push(newUser);
+        saveUsers();
+        return true;
+      };
+      const registered = navigator.locks
+        ? await navigator.locks.request("racetech-user-registration", register)
+        : register();
+      if (!registered) {
+        setAuthMessage("That call sign was just claimed. Usernames are case-insensitive.", "#ff9b82");
+        return;
+      }
+      loginSession(newUser);
       return;
     }
-    const newUser = { username, pass: password, role: usersDB.some(user => user.role === "Admin") ? "Visitor" : "Admin" };
-    usersDB.push(newUser);
-    saveUsers();
-    loginSession(newUser);
-    return;
-  }
 
-  const user = usersDB.find(item => item.username.toLowerCase() === username.toLowerCase() && item.pass === password);
-  if (!user) {
-    setAuthMessage("Call sign or password not recognized.", "#ff9b82");
-    return;
+    const user = usersDB.find(item => normalizeUsername(item.username) === normalizedUsername);
+    if (!user || !(await verifyPassword(user, password))) {
+      setAuthMessage("Call sign or password not recognized.", "#ff9b82");
+      return;
+    }
+    loginSession(user);
+  } catch (error) {
+    console.error("Authentication could not be completed.", error);
+    setAuthMessage("Secure sign-in is unavailable. Try a supported browser.", "#ff9b82");
   }
-  loginSession(user);
 }
 
 function loginSession(user) {
   currentUser = user;
-  localStorage.setItem("nexus_session_user", JSON.stringify(user));
+  localStorage.setItem("nexus_session_user", JSON.stringify({ username: user.username }));
   document.getElementById("auth-form").reset();
   closeModal("auth-modal");
   syncUIWithRole();
@@ -109,16 +270,27 @@ function logoutUser() {
   }
 }
 
-function isStaff() {
-  return currentUser && (currentUser.role === "Admin" || currentUser.role === "Moderator");
+function canEditText() {
+  return Boolean(currentUser && ["Admin", "Moderator"].includes(currentUser.role));
+}
+
+function canUploadGallery() {
+  return Boolean(currentUser && ["Admin", "Moderator", "Team Member"].includes(currentUser.role));
+}
+
+function canViewAdmin() {
+  return Boolean(currentUser && ["Admin", "Moderator"].includes(currentUser.role));
 }
 
 function syncUIWithRole() {
   if (currentUser) {
-    const freshUser = usersDB.find(user => user.username.toLowerCase() === currentUser.username.toLowerCase());
+    const freshUser = usersDB.find(user => normalizeUsername(user.username) === normalizeUsername(currentUser.username));
     if (freshUser) {
       currentUser = freshUser;
-      localStorage.setItem("nexus_session_user", JSON.stringify(currentUser));
+      localStorage.setItem("nexus_session_user", JSON.stringify({ username: freshUser.username }));
+    } else {
+      currentUser = null;
+      localStorage.removeItem("nexus_session_user");
     }
   }
 
@@ -126,12 +298,18 @@ function syncUIWithRole() {
   if (loginButton) loginButton.textContent = currentUser ? currentUser.username : "Team login";
   const badgeContainer = document.getElementById("role-badge-container");
   if (badgeContainer) {
-    badgeContainer.innerHTML = currentUser ? `<span class="role-pill ${currentUser.role === "Admin" ? "badge-admin" : currentUser.role === "Moderator" ? "badge-mod" : "badge-team"}">${escapeHTML(currentUser.role)}</span>` : "";
+    badgeContainer.innerHTML = currentUser ? `<span class="role-pill ${currentUser.role === "Admin" ? "badge-admin" : currentUser.role === "Moderator" ? "badge-mod" : currentUser.role === "Team Member" ? "badge-team" : "badge-user"}">${escapeHTML(currentUser.role)}</span>` : "";
   }
   const adminLink = document.getElementById("nav-admin-link");
-  if (adminLink) adminLink.hidden = !(currentUser && (currentUser.role === "Admin" || currentUser.role === "Moderator"));
+  if (adminLink) adminLink.hidden = !canViewAdmin();
   const toolbar = document.getElementById("cms-toolbar");
-  if (toolbar) toolbar.hidden = !isStaff();
+  if (toolbar) toolbar.hidden = !(canEditText() || (document.body.dataset.page === "gallery" && canUploadGallery()) || (document.body.dataset.page === "home" && currentUser?.role === "Admin"));
+  const editButton = document.getElementById("toggle-edit-mode");
+  if (editButton) editButton.hidden = !canEditText();
+  const editState = document.getElementById("edit-state");
+  if (editState) editState.hidden = !canEditText();
+  const homeUpload = document.getElementById("home-upload-control");
+  if (homeUpload) homeUpload.hidden = !currentUser || currentUser.role !== "Admin";
   const logoutButton = document.getElementById("logout-button");
   if (logoutButton) logoutButton.hidden = !currentUser;
 
@@ -163,7 +341,11 @@ function renderTeamRoster() {
     const name = document.createElement("h3");
     name.textContent = member.username;
     const role = document.createElement("p");
-    role.textContent = `${member.role} · On the RaceTech crew`;
+    role.textContent = "On the RaceTech crew";
+    const roleBadge = document.createElement("span");
+    roleBadge.className = `role-pill ${member.role === "Admin" ? "badge-admin" : member.role === "Moderator" ? "badge-mod" : "badge-team"} team-profile-badge`;
+    roleBadge.textContent = member.role;
+    role.append(" ", roleBadge);
     card.append(icon, name, role);
     return card;
   }));
@@ -179,12 +361,12 @@ function renderAdminTable() {
     return;
   }
   notice.innerHTML = currentUser.role === "Admin"
-    ? "<strong>Admin access:</strong> You can manage crew roles."
+    ? "<strong>Admin access:</strong> You can manage crew roles. The master admin role is protected."
     : "<strong>Moderator access:</strong> You can view the crew list. Only admins can change roles.";
   tableBody.replaceChildren(...usersDB.map(member => {
     const row = document.createElement("tr");
     const name = document.createElement("td");
-    name.textContent = member.username;
+    name.textContent = `${member.username}${isMasterAdmin(member.username) ? " (Master Admin)" : ""}`;
     const roleCell = document.createElement("td");
     const badge = document.createElement("span");
     badge.className = `role-pill ${member.role === "Admin" ? "badge-admin" : member.role === "Moderator" ? "badge-mod" : "badge-team"}`;
@@ -196,14 +378,14 @@ function renderAdminTable() {
     const select = document.createElement("select");
     select.className = "role-select";
     select.setAttribute("aria-label", `Change role for ${member.username}`);
-    select.disabled = currentUser.role !== "Admin" || member.username.toLowerCase() === "asavov09";
-    ["Visitor", "Team Member", "Moderator", "Admin"].forEach(role => {
+    select.disabled = currentUser.role !== "Admin" || isMasterAdmin(member.username);
+    for (const role of VALID_ROLES) {
       const option = document.createElement("option");
       option.value = role;
       option.textContent = role;
       option.selected = member.role === role;
       select.append(option);
-    });
+    }
     select.addEventListener("change", () => updateUserRole(member.username, select.value));
     controlCell.append(select);
     row.append(name, roleCell, access, controlCell);
@@ -213,20 +395,20 @@ function renderAdminTable() {
 
 function updateUserRole(username, newRole) {
   if (!currentUser || currentUser.role !== "Admin") return;
-  if (!["Visitor", "Team Member", "Moderator", "Admin"].includes(newRole)) return;
-  if (username.toLowerCase() === "asavov09") return;
-  const user = usersDB.find(member => member.username === username);
-  if (!user) return;
-  user.role = newRole;
+  if (!VALID_ROLES.includes(newRole) || isMasterAdmin(username)) return;
+  const target = usersDB.find(member => normalizeUsername(member.username) === normalizeUsername(username));
+  if (!target) return;
+  target.role = newRole;
   saveUsers();
   syncUIWithRole();
   renderAdminTable();
+  allowProtectedPage();
 }
 
 function renderGallery() {
   const grid = document.getElementById("gallery-grid");
   if (!grid) return;
-  const staff = isStaff();
+  const canDelete = Boolean(currentUser && currentUser.role === "Admin");
   grid.replaceChildren(...galleryDB.map(item => {
     const card = document.createElement("article");
     card.className = "gallery-card";
@@ -245,7 +427,7 @@ function renderGallery() {
     title.textContent = item.caption;
     caption.append(marker, title);
     footer.append(caption);
-    if (staff) {
+    if (canDelete) {
       const remove = document.createElement("button");
       remove.className = "tech-btn delete-photo";
       remove.type = "button";
@@ -294,6 +476,11 @@ function processImage(file, onComplete) {
 }
 
 function uploadHomeImage(event) {
+  if (!currentUser || currentUser.role !== "Admin") {
+    alert("Only Admins can change the home feature photo.");
+    event.target.value = "";
+    return;
+  }
   const file = event.target.files[0];
   if (!file) return;
   processImage(file, source => {
@@ -306,6 +493,11 @@ function uploadHomeImage(event) {
 }
 
 function uploadGalleryImage(event) {
+  if (!canUploadGallery()) {
+    alert("Gallery uploads are available to Admins, Mods, and Team Members.");
+    event.target.value = "";
+    return;
+  }
   const file = event.target.files[0];
   if (!file) return;
   const caption = prompt("Name this build or moment:", "Workshop snapshot");
@@ -322,13 +514,14 @@ function uploadGalleryImage(event) {
 }
 
 function deleteGalleryImage(id) {
+  if (!currentUser || currentUser.role !== "Admin") return;
   galleryDB = galleryDB.filter(item => item.id !== id);
   localStorage.setItem("nexus_gallery_db", JSON.stringify(galleryDB));
   renderGallery();
 }
 
 function toggleEditMode() {
-  if (!isStaff()) return;
+  if (!canEditText()) return;
   editModeActive = !editModeActive;
   const state = document.getElementById("edit-state");
   if (state) state.textContent = editModeActive ? "Edit mode is on — click text to change" : "Edit mode is off";
@@ -374,13 +567,17 @@ function allowProtectedPage() {
   const page = document.body.dataset.page;
   if (page === "home") return;
   const main = document.querySelector("main");
-  if (currentUser && (page !== "admin" || ["Admin", "Moderator"].includes(currentUser.role))) {
+  if ((page === "admin" && canViewAdmin()) || (page !== "admin" && currentUser)) {
     if (main) main.hidden = false;
     return;
   }
   if (main) main.hidden = true;
+  if (currentUser) {
+    window.location.replace("index.html");
+    return;
+  }
   openModal("auth-modal");
-  setAuthMessage(page === "admin" && currentUser ? "Admin or moderator access is required." : "Please sign in or create an account to continue.", "#ff9b82");
+  setAuthMessage("Please sign in or create an account to continue.", "#ff9b82");
 }
 
 function setupPagesMenu() {
@@ -415,11 +612,23 @@ document.addEventListener("mousemove", event => {
   document.documentElement.style.setProperty("--pointer-y", `${event.clientY}px`);
 });
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   setupPagesMenu();
   loadSavedContent();
-  syncUIWithRole();
-  allowProtectedPage();
-  const currentLink = document.querySelector(`#pages-menu a[href="${document.body.dataset.page === "home" ? "index.html" : `${document.body.dataset.page === "gallery" ? "gallery.html" : `${document.body.dataset.page === "team" ? "team.html" : "admin.html"}`}`}"]`);
+  try {
+    await initializeUsers();
+    const savedSession = readStore("nexus_session_user", null);
+    const savedUsername = typeof savedSession === "string" ? savedSession : savedSession?.username;
+    currentUser = usersDB.find(user => normalizeUsername(user.username) === normalizeUsername(savedUsername)) || null;
+    if (!currentUser) localStorage.removeItem("nexus_session_user");
+    syncUIWithRole();
+    allowProtectedPage();
+  } catch (error) {
+    console.error("Could not initialize account storage.", error);
+    setAuthMessage("Secure account storage could not be initialized in this browser.", "#ff9b82");
+    openModal("auth-modal");
+  }
+  const pageFiles = { home: "index.html", gallery: "gallery.html", team: "team.html", admin: "admin.html" };
+  const currentLink = document.querySelector(`#pages-menu a[href="${pageFiles[document.body.dataset.page]}"]`);
   if (currentLink) currentLink.setAttribute("aria-current", "page");
 });
