@@ -15,19 +15,29 @@
   <body data-page="garage">
     <div class="site-shell">
       <header class="navbar">
-        <a class="logo" href="index.html" aria-label="RaceTech Robotics home"><span class="logo-mark" aria-hidden="true">R</span><span>RaceTech <span class="logo-light">Robotics</span></span></a>
+        <a class="logo" href="index.html" aria-label="RaceTech Robotics home"><img class="logo-mark" src="racetech-logo.png" alt="" /><span>RaceTech <span class="logo-light">Robotics</span></span></a>
         <nav class="nav-controls" aria-label="Main navigation">
           <div class="pages-dropdown"><button class="tech-btn nav-trigger" id="pages-toggle" type="button" aria-expanded="false" aria-controls="pages-menu">Pages <span class="chevron" aria-hidden="true">⌄</span></button><div class="dropdown-content" id="pages-menu" hidden><a href="index.html"><span>01</span> Home</a><a href="garage.html" aria-current="page"><span>02</span> Garage</a><a href="gallery.html"><span>03</span> Gallery</a><a href="projects.html"><span>04</span> Projects</a><a href="final-projects.html"><span>05</span> Final Projects</a><a href="team.html"><span>06</span> The team</a></div></div>
           <button class="tech-btn" type="button" onclick="openModal('settings-modal')">Settings</button>
         </nav>
       </header>
       <main class="container subpage">
-        <header class="page-heading"><p class="eyebrow">02 / THE GARAGE</p><h1>Made to be <span>driven.</span></h1><p>Builds, tweaks, and snapshots from our little corner of the RC world.</p></header>
-        <section class="gallery-grid" id="gallery-grid" aria-label="Garage builds">
-          <article class="gallery-card"><img class="gallery-img" src="https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Radio-controlled car ready for a weekend test run" loading="lazy" /><div class="gallery-caption"><div><p class="eyebrow">RACETECH / BUILD LOG</p><div>Weekend test run</div></div></div></article>
-          <article class="gallery-card"><img class="gallery-img" src="https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="Close look at a car chassis" loading="lazy" /><div class="gallery-caption"><div><p class="eyebrow">RACETECH / BUILD LOG</p><div>Chassis study</div></div></div></article>
-          <article class="gallery-card"><img class="gallery-img" src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&amp;fit=crop&amp;w=900&amp;q=80" alt="A car back in the workshop" loading="lazy" /><div class="gallery-caption"><div><p class="eyebrow">RACETECH / BUILD LOG</p><div>Back in the workshop</div></div></div></article>
+        <header class="page-heading"><p class="eyebrow">02 / THE GARAGE</p><h1>Built on the bench.<br /><span>Ready to run.</span></h1><p>Smooth and optimal design, meant to dominate the track.</p></header>
+        <section class="garage-grid" aria-label="Featured garage builds">
+          <article class="garage-card">
+            <figure class="garage-card-media"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="Placeholder image for the Switchback all-terrain RC build" loading="lazy" /><figcaption>BUILD 01 / ALL-TERRAIN</figcaption></figure>
+            <div class="garage-card-copy"><p class="eyebrow">PROJECT SWITCHBACK</p><h2>Take the rough line.</h2><p>A nimble all-terrain platform shaped around tight turns, loose gravel, and quick setup changes.</p><dl class="garage-specs"><div><dt>Build focus</dt><dd>Handling &amp; suspension</dd></div><div><dt>Next step</dt><dd>Dial in ride height</dd></div></dl><a class="text-button" href="projects.html">Follow the build <span aria-hidden="true">→</span></a></div>
+          </article>
+          <article class="garage-card">
+            <figure class="garage-card-media"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="Placeholder image for the Nightline street RC build" loading="lazy" /><figcaption>BUILD 02 / STREET</figcaption></figure>
+            <div class="garage-card-copy"><p class="eyebrow">PROJECT NIGHTLINE</p><h2>Made for smooth lines.</h2><p>A low-slung street concept exploring a clean silhouette, balanced weight, and smooth evening runs.</p><dl class="garage-specs"><div><dt>Build focus</dt><dd>Body design &amp; balance</dd></div><div><dt>Next step</dt><dd>Choose the final shell</dd></div></dl><a class="text-button" href="projects.html">Follow the build <span aria-hidden="true">→</span></a></div>
+          </article>
+          <article class="garage-card">
+            <figure class="garage-card-media"><img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="Placeholder image for the Apex track-focused RC build" loading="lazy" /><figcaption>BUILD 03 / TRACK</figcaption></figure>
+            <div class="garage-card-copy"><p class="eyebrow">PROJECT APEX</p><h2>Find the fast way round.</h2><p>A compact track-focused setup tuned for sharper response, repeatable laps, and easy maintenance.</p><dl class="garage-specs"><div><dt>Build focus</dt><dd>Drivetrain &amp; tuning</dd></div><div><dt>Next step</dt><dd>Run repeatable laps</dd></div></dl><a class="text-button" href="projects.html">Follow the build <span aria-hidden="true">→</span></a></div>
+          </article>
         </section>
+        <section class="gallery-note"><p class="eyebrow">MAKE IT YOUR GARAGE</p><p>Replace the sample build names, notes, and placeholder image URLs in <code>garage.html</code> with your team's cars. For workshop and track photos, head to the <a href="gallery.html">photo gallery</a>.</p></section>
       </main>
       <footer class="site-footer"><a class="footer-brand" href="index.html">RaceTech Robotics</a><span>Built with curiosity. Tuned for fun.</span><a href="gallery.html">Browse the gallery ↗</a></footer>
     </div>

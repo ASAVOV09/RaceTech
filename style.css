@@ -82,7 +82,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 .text-button:hover { gap: 14px; color: var(--accent); }
 .navbar {
-  position: sticky;
+  position: relative;
   z-index: 20;
   top: 0;
   display: flex;
@@ -90,22 +90,18 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   justify-content: space-between;
   align-items: center;
   gap: 24px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(16, 19, 22, 0.9);
-  backdrop-filter: blur(16px);
+  border-bottom: 1px solid transparent;
+  background: transparent;
 }
 .logo { display: inline-flex; align-items: center; gap: 12px; font-size: 0.97rem; font-weight: 800; letter-spacing: -0.04em; white-space: nowrap; }
 .logo-mark {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border: 1px solid var(--accent);
-  border-radius: 11px 4px 11px 4px;
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: 1.1rem;
-  font-weight: 500;
+  display: block;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #000;
+  object-fit: contain;
 }
 .logo-light { color: var(--muted); font-weight: 500; }
 .nav-controls { display: flex; align-items: center; gap: 9px; }
@@ -391,12 +387,12 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 @media (max-width: 600px) {
   .site-shell { width: calc(100% - 32px); }
   .rec-banner { align-items: start; padding: 10px 0; font-size: 0.68rem; }
-  .navbar { min-height: 70px; flex-wrap: wrap; gap: 12px; padding: 12px 0; }
-  .logo { font-size: 0.85rem; }
-  .logo-mark { width: 31px; height: 31px; }
-  .nav-controls { width: 100%; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
-  .nav-controls > .tech-btn { min-height: 36px; padding: 0 10px; font-size: 0.68rem; }
-  .nav-trigger { min-width: auto; min-height: 36px; padding: 0 10px; font-size: 0.68rem; }
+  .navbar { min-height: 58px; flex-wrap: nowrap; gap: 8px; padding: 8px 0; }
+  .logo { gap: 8px; font-size: 0.78rem; }
+  .logo-mark { width: 36px; height: 36px; }
+  .nav-controls { width: auto; flex-wrap: nowrap; justify-content: flex-end; gap: 6px; }
+  .nav-controls > .tech-btn { min-height: 36px; padding: 0 9px; font-size: 0.68rem; }
+  .nav-trigger { min-width: 78px; min-height: 36px; padding: 0 9px; font-size: 0.68rem; }
   .container { padding: 25px 0 70px; }
   .hero { gap: 30px; padding: 39px 0 46px; }
   .hero h1 { font-size: clamp(2.2rem, 14vw, 4.3rem); }
@@ -444,16 +440,14 @@ body { background: var(--bg); }
 .rec-banner { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.015em; }
 .navbar {
   border-color: var(--line-strong);
-  background: rgba(195, 202, 202, 0.94);
-  box-shadow: 0 8px 28px rgba(28, 43, 48, 0.1);
-  backdrop-filter: blur(18px);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 .logo { letter-spacing: -0.055em; }
 .logo-mark {
-  border-radius: 5px;
-  background: #35444a;
-  color: #f1b18d;
-  box-shadow: inset 0 0 0 3px rgba(226, 234, 233, 0.12);
+  border-radius: 50%;
+  background: #000;
 }
 .tech-btn {
   border-color: var(--line-strong);
@@ -647,8 +641,8 @@ body { background: var(--bg); }
   .page-heading::after { top: 25px; right: -35px; opacity: 0.45; }
 }
 
-/* Dark, opaque engineering surfaces with a full-screen welcome photo. */
-.navbar { background: var(--bg); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18); }
+/* Dark engineering surfaces with a full-screen welcome photo. */
+.navbar { border-color: transparent; background: transparent; box-shadow: none; }
 .tech-btn { background: var(--panel); }
 .tech-btn:hover { border-color: rgba(233, 154, 112, 0.64); background: #414a50; }
 .primary-btn { border-color: #d28259; background: #a65334; color: #fff8f2; }
@@ -742,4 +736,42 @@ body { background: var(--bg); }
   }
   .welcome-hero { min-height: calc(100svh - 120px); }
   .welcome-hero .hero-desc { color: #f0f2f0; }
+}
+
+@media (max-width: 400px) {
+  .navbar { gap: 6px; }
+  .logo { gap: 6px; font-size: 0.7rem; }
+  .logo-mark { width: 32px; height: 32px; }
+  .nav-controls { gap: 4px; }
+  .nav-controls > .tech-btn { padding: 0 7px; font-size: 0.63rem; }
+  .nav-trigger { min-width: 68px; padding: 0 7px; font-size: 0.63rem; }
+}
+
+.garage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; padding-top: 32px; }
+.garage-card { overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15); transition: transform 200ms ease, border-color 200ms ease; }
+.garage-card:hover { transform: translateY(-3px); border-color: rgba(233, 154, 112, 0.58); }
+.garage-card-media { position: relative; height: 220px; margin: 0; overflow: hidden; background: var(--panel-raised); }
+.garage-card-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 250ms ease; }
+.garage-card:hover .garage-card-media img { transform: scale(1.035); }
+.garage-card-media figcaption { position: absolute; right: 10px; bottom: 10px; padding: 7px 9px; border: 1px solid var(--line-strong); border-radius: 3px; background: rgba(25, 30, 34, 0.88); color: #f2f4f2; font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.06em; }
+.garage-card-copy { padding: 20px; }
+.garage-card-copy > .eyebrow { color: var(--accent-dark); font-size: 0.61rem; }
+.garage-card-copy h2 { margin: 8px 0; font-size: clamp(1.25rem, 2vw, 1.7rem); letter-spacing: -0.06em; }
+.garage-card-copy > p:not(.eyebrow) { min-height: 4.8em; margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.7; }
+.garage-specs { display: grid; gap: 10px; margin: 18px 0; }
+.garage-specs div { display: grid; grid-template-columns: 82px 1fr; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.garage-specs dt { color: var(--muted); font-family: var(--mono); font-size: 0.58rem; text-transform: uppercase; }
+.garage-specs dd { margin: 0; font-size: 0.69rem; }
+.garage-card-copy .text-button { font-size: 0.75rem; }
+
+@media (max-width: 900px) {
+  .garage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .garage-grid { grid-template-columns: 1fr; gap: 12px; padding-top: 20px; }
+  .garage-card-media { height: 63vw; max-height: 340px; }
+  .garage-card-copy > p:not(.eyebrow) { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .garage-card, .garage-card-media img { transition: none; }
 }
